@@ -28,9 +28,9 @@ def form():
     return render_template('form.html',
                             form=form)
 
-@app.route('/name')
-def name():
-    return render_template('name.html')
+@app.route('/user/<name>')
+def user(name):
+    return render_template('user.html', name=name)
 
 
 # ERRORS

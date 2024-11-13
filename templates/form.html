@@ -3,14 +3,17 @@
 {% block content%}
 <form method="POST" action="/form">
     {{ form.csrf_token }}
+    {{ form.hidden_tag() }}
+
     <div>
-        {{ form.name.label }} {{ form.name(size=20) }}
+        {{ form.name.label }} {{ form.name(class="form-control") }}
     </div>
     <div>
-        {{ form.birthday.label }} {{ form.birthday }}
+        {{ form.birthday.label }} {{ form.birthday(class="form-control") }}
     </div>
     <div>
-        {{form.submit}}
+        <br>
+        {{form.submit(class="btn btn-danger")}}
     </div>
     
     {% if form.name.errors %}
