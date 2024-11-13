@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template, redirect, url_for
+from flask import Flask, request, render_template, redirect, url_for, flash
 from flask_wtf import FlaskForm
 from wtforms import StringField, DateField, SubmitField
 from wtforms.validators import DataRequired
@@ -21,12 +21,16 @@ def home():
 
 @app.route('/form', methods=['GET', 'POST'])
 def form():
+    name = None
     form = MyForm()
     if form.validate_on_submit():
-        return render_template('name.html', name=form.name.data)
+        name = form.name.data
+        form.name.data = ""
+        flash('Form Submitted succesfully !', category="info")
 
     return render_template('form.html',
-                            form=form)
+                            form = form,
+                            name = name)
 
 @app.route('/user/<name>')
 def user(name):
