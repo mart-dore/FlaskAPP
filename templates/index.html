@@ -14,7 +14,9 @@
         <div>
             {{ form.birthday.label }} {{ form.birthday }}
         </div>
-        <input type="submit" value="Go">
+        <div>
+            {{form.submit}}
+        </div>
 
         {% if form.name.errors %}
         <ul class="errors">
@@ -23,4 +25,4 @@
             {% endfor %}
         </ul>
         {% endif %}
-    </
+
