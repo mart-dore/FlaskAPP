@@ -1,26 +1,7 @@
 {% extends 'base.html' %}
 {% block content%}
 
-
-    <form method="POST" action="/">
-        {{ form.csrf_token }}
-        <div>
-            {{ form.name.label }} {{ form.name(size=20) }}
-        </div>
-        <div>
-            {{ form.birthday.label }} {{ form.birthday }}
-        </div>
-        <div>
-            {{form.submit}}
-        </div>
-        
-        {% if form.name.errors %}
-        <ul class="errors">
-            {% for error in form.name.errors %}
-            <li>{{ error }}</li>
-            {% endfor %}
-        </ul>
-        {% endif %}
-            
+ <h1>PAGE PRINCIPALE</h1>
+    
             
 {% endblock %}

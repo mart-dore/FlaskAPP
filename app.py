@@ -14,19 +14,26 @@ class MyForm(FlaskForm):
 
 @app.route('/', methods=['GET', 'POST'])
 def home():
+    # form = MyForm()
+    # if form.validate_on_submit():
+    #     return render_template('name.html', name = form.name.data)
+    return render_template('index.html')
+
+@app.route('/form', methods=['GET', 'POST'])
+def form():
     form = MyForm()
     if form.validate_on_submit():
-        # Traiter les données du formulaire ici
-        return render_template('name.html', name = form.name.data)
-    return render_template('index.html',
-                           form=form)
+        return render_template('name.html', name=form.name.data)
 
-@app.route('/success')
-def success():
-    return "Form successfully submitted!"
+    return render_template('form.html',
+                            form=form)
+
+@app.route('/name')
+def name():
+    return render_template('name.html')
+
 
 # ERRORS
-
 # Invalid URL / Pagename
 @app.errorhandler(404)
 def page_not_found(e):
