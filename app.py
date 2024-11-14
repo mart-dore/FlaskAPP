@@ -118,6 +118,10 @@ def update(id):
 
 
 
+# TODO DELETE DB RECORD
+# @app.route('/delete')
+
+
 # PAGE USER/NAME
 @app.route('/user/<name>')
 def user(name):
