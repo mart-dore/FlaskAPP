@@ -12,10 +12,20 @@
     {% if name %}
         <p>
         Salut <strong>{{ name }} </strong>
+        <table class="table table-striped table-hover">
+            {% for our_user in our_users %}
+                <tr>
+                    <td>{{ our_user.id }}</td>
+                    <td>{{ our_user.name }}</td>
+                    <td>{{ our_user.email }}</td>
+                </tr>
+                
+            {% endfor %}
+            </table>
    
     {% else %}
         <h1>User List</h1>
-
+    <div class="shadow p-3 mb-5 bg-body-tertiary rounded">
         <form method="POST">
             {{ form.csrf_token }}
             {{ form.hidden_tag() }}
@@ -24,13 +34,14 @@
                 {{ form.name.label }} {{ form.name(class="form-control") }}
             </div>
             <div>
-                {{ form.birthday.label }} {{ form.birthday(class="form-control") }}
+                {{ form.email.label }} {{ form.email(class="form-control") }}
             </div>
             <div>
                 <br>
                 {{form.submit(class="btn btn-danger")}}
             </div>
-            
+        </form>
+    </div>            
             {% if form.name.errors %}
             <ul class="errors">
                 {% for error in form.name.errors %}
@@ -38,5 +49,19 @@
                 {% endfor %}
             </ul>
             {% endif %}
-        {% endif %}
+    {% endif %}
+
+    <br><br>
+    
+    <table class="table table-striped table-hover">
+    {% for our_user in our_users %}
+        <tr>
+            <td>{{ our_user.id }}</td>
+            <td>{{ our_user.name }}</td>
+            <td>{{ our_user.email }}</td>
+        </tr>
+        
+    {% endfor %}
+    </table>
+
 {% endblock %}
