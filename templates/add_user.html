@@ -12,17 +12,9 @@
     {% if name %}
         <p>
         Salut <strong>{{ name }} </strong>
-    </p>
-    <img src="{{ url_for('static', filename='images/Donkey_(Shrek).png')}}" alt="donkey" width="200">
-
-    <br/>
-    <p id="demo"> stuf stuf... </p>
-
-    <script src="{{ url_for('static', filename='js/test.js')}}"></script>
-
-
+   
     {% else %}
-        <h1>What is your name ?</h1>
+        <h1>User List</h1>
 
         <form method="POST">
             {{ form.csrf_token }}

@@ -2,16 +2,47 @@ from flask import Flask, request, render_template, redirect, url_for, flash
 from flask_wtf import FlaskForm
 from wtforms import StringField, DateField, SubmitField
 from wtforms.validators import DataRequired
+from flask_sqlalchemy import SQLAlchemy
+from datetime import datetime
 
+# Create Flask Instance
 app = Flask(__name__)
+
+# Add database 
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
+# Secret Key
 app.config['SECRET_KEY'] = 'your_secret_key'  # Clé secrète pour CSRF
 
+# Init db
+db = SQLAlchemy(app)
+
+
+# Create Model
+class Users(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False)
+    email = db.Column(db.String(100), nullable=False, unique=True)
+    date_added = db.Column(db.DateTime, default=datetime.now())
+
+    # Create a String
+    def __repr__(self):
+        return '<Name %r>' % self.name
+    
+# Form for User
+class UserForm(FlaskForm):
+    name = StringField('Name', validators=[DataRequired()])
+    email = StringField('Email', validators=[DataRequired()])
+    submit = SubmitField('Submit user')
+
+
+# Form for name test
 class MyForm(FlaskForm):
     name = StringField('Name', validators=[DataRequired()])
     birthday = DateField('Birthday', format='%Y-%m-%d', validators=[DataRequired()])
     submit = SubmitField('Submit form')
 
 
+# Page 1 : INDEX
 @app.route('/', methods=['GET', 'POST'])
 def home():
     # form = MyForm()
@@ -19,6 +50,7 @@ def home():
     #     return render_template('name.html', name = form.name.data)
     return render_template('index.html')
 
+# PAGE 2 : FORM
 @app.route('/form', methods=['GET', 'POST'])
 def form():
     name = None
@@ -32,6 +64,14 @@ def form():
                             form = form,
                             name = name)
 
+
+# PAGE USER/ADD
+@app.route('user/add', methods=['GET', 'POST'])
+def add_user():
+    return render_template('add_user.html')
+
+
+# PAGE USER/NAME
 @app.route('/user/<name>')
 def user(name):
     return render_template('user.html', name=name)
