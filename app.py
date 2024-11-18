@@ -60,14 +60,21 @@ class UserForm(FlaskForm):
     password_hash2 = PasswordField('Confirm Password',
                                    validators=[DataRequired()])
 
-
-# Form for name test
+# Form for Name and Birthday to say hello
 class MyForm(FlaskForm):
     name = StringField('Name',
                        validators=[DataRequired()])
     birthday = DateField('Birthday',
                          format='%Y-%m-%d', validators=[DataRequired()])
 
+    submit = SubmitField('Submit form')
+
+# Form to check password
+class PasswordForm(FlaskForm):
+    email = StringField('Email',
+                       validators=[DataRequired()])
+    password_hash  = PasswordField('Password',
+                             validators=[DataRequired()])
     submit = SubmitField('Submit form')
 
 
@@ -92,6 +99,37 @@ def form():
     return render_template('form.html',
                             form = form,
                             name = name)
+
+# PAGE 3 : Test Password
+@app.route('/test_pw', methods=['GET', 'POST'])
+def test_pw():
+    email = None
+    password = None
+    pw_to_check = None
+    passed = None # is check valid or not
+
+    form = PasswordForm()
+    if form.validate_on_submit():
+        email = form.email.data
+        password = form.password_hash.data
+        
+        # Clear the form
+        form.email.data = ''
+        form.password_hash.data = ''
+
+        # Check password
+        # Lookup users by email address
+        pw_to_check = Users.query.filter_by(email=email).first()
+        passed = check_password_hash(pw_to_check.password_hash, password)
+
+        # flash('Form Submitted succesfully !', category="info")
+
+    return render_template('test_pw.html',
+                            form = form,
+                            email = email,
+                            password = password,
+                            pw_to_check = pw_to_check,
+                            passed = passed)
 
 
 # PAGE USER/ADD
@@ -152,8 +190,6 @@ def update(id):
                                 id = id )
 
 
-
-# TODO DELETE DB RECORD
 @app.route('/delete<int:id>')
 def delete(id):
     user_to_delete = Users.query.get_or_404(id)
