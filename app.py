@@ -1,7 +1,7 @@
 from flask import Flask, request, render_template, redirect, url_for, flash
 from flask_wtf import FlaskForm
 from wtforms import StringField, DateField, SubmitField, PasswordField, BooleanField, ValidationError
-from wtforms.validators import DataRequired
+from wtforms.validators import DataRequired, EqualTo, Length
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -55,14 +55,19 @@ class UserForm(FlaskForm):
     name = StringField('Name', validators=[DataRequired()])
     email = StringField('Email', validators=[DataRequired()])
     submit = SubmitField('Submit user')
+    password_hash = PasswordField('Password',
+                                  validators=[DataRequired(), EqualTo('password_hash2', message='Passwords not matching')])
+    password_hash2 = PasswordField('Confirm Password',
+                                   validators=[DataRequired()])
 
 
 # Form for name test
 class MyForm(FlaskForm):
-    name = StringField('Name', validators=[DataRequired()])
-    birthday = DateField('Birthday', format='%Y-%m-%d', validators=[DataRequired()])
-    password_hash = 
-    password_hash2 = 
+    name = StringField('Name',
+                       validators=[DataRequired()])
+    birthday = DateField('Birthday',
+                         format='%Y-%m-%d', validators=[DataRequired()])
+
     submit = SubmitField('Submit form')
 
 
@@ -98,14 +103,17 @@ def add_user():
         # get first user with same email address
         user = Users.query.filter_by(email=form.email.data).first()
         if user is None:
-            # add user to db
-            user = Users(name=form.name.data, email=form.email.data)
+            # Hash password
+            hashed_pw = generate_password_hash(form.password_hash.data)
+            # Add user to db
+            user = Users(name=form.name.data, email=form.email.data, password_hash=hashed_pw)
             db.session.add(user)
             db.session.commit()
         name = form.name.data
         # Clear form
         form.name.data = ''
         form.email.data = ''
+        form.password_hash = ''
         flash('User add succesfully')
     our_users = Users.query.order_by(Users.date_added)
 
