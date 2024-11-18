@@ -4,6 +4,8 @@ from wtforms import StringField, DateField, SubmitField
 from wtforms.validators import DataRequired
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
+from werkzeug.security import generate_password_hash, check_password_hash
+
 
 # Create Flask Instance
 app = Flask(__name__)
@@ -24,7 +26,21 @@ class Users(db.Model):
     email = db.Column(db.String(100), nullable=False, unique=True)
     date_added = db.Column(db.DateTime, default=datetime.now())
 
-    # Create a String
+    # Add password authentification
+    password_hash = db.Column(db.String(128))
+
+    @property
+    def password(self):
+        raise AttributeError('Password is not a readable attribute')
+    
+    @password.setter
+    def password(self, password):
+        self.password_hash = generate_password_hash(password)
+    
+    def verify_password(self, password):
+        return check_password_hash(self.password_hash, password)
+
+    # Create a String (equivalent of toString methods in Java)
     def __repr__(self):
         return '<Name %r>' % self.name
     
