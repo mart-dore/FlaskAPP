@@ -1,10 +1,11 @@
 from flask import Flask, request, render_template, redirect, url_for, flash
 from flask_wtf import FlaskForm
-from wtforms import StringField, DateField, SubmitField
+from wtforms import StringField, DateField, SubmitField, PasswordField, BooleanField, ValidationError
 from wtforms.validators import DataRequired
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
+from flask_migrate import Migrate
 
 
 # Create Flask Instance
@@ -17,9 +18,14 @@ app.config['SECRET_KEY'] = 'your_secret_key'  # Clé secrète pour CSRF
 
 # Init db
 db = SQLAlchemy(app)
+# add database migration automation, allowing simple migration of the db
+# each time we change one of our db.Model
+migrate = Migrate(app, db)
 
 
-# Create Model
+
+
+# Create User's model
 class Users(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
@@ -55,6 +61,8 @@ class UserForm(FlaskForm):
 class MyForm(FlaskForm):
     name = StringField('Name', validators=[DataRequired()])
     birthday = DateField('Birthday', format='%Y-%m-%d', validators=[DataRequired()])
+    password_hash = 
+    password_hash2 = 
     submit = SubmitField('Submit form')
 
 
