@@ -1,2 +1,3 @@
-# CV-generator
-Web application to generate CV automatically from a form
+# Flask APP
+
+First Step with Flask API to develop a web application.
