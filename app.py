@@ -1,7 +1,8 @@
 from flask import Flask, request, render_template, redirect, url_for, flash
 from flask_wtf import FlaskForm
-from wtforms import StringField, DateField, SubmitField, PasswordField, BooleanField, ValidationError
+from wtforms import StringField, DateField, SubmitField, PasswordField, BooleanField, TextAreaField,ValidationError
 from wtforms.validators import DataRequired, EqualTo, Length
+from wtforms.widgets import TextArea
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -21,9 +22,6 @@ db = SQLAlchemy(app)
 # add database migration automation, allowing simple migration of the db
 # each time we change one of our db.Model
 migrate = Migrate(app, db)
-
-
-
 
 # Create User's model
 class Users(db.Model):
@@ -49,7 +47,7 @@ class Users(db.Model):
     # Create a String (equivalent of toString methods in Java)
     def __repr__(self):
         return '<Name %r>' % self.name
-    
+
 # Form for User
 class UserForm(FlaskForm):
     name = StringField('Name', validators=[DataRequired()])
@@ -59,6 +57,23 @@ class UserForm(FlaskForm):
                                   validators=[DataRequired(), EqualTo('password_hash2', message='Passwords not matching')])
     password_hash2 = PasswordField('Confirm Password',
                                    validators=[DataRequired()])
+
+# Create a blog post Model
+class Posts(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(255))
+    content = db.Column(db.Text)
+    author = db.Column(db.String(255))
+    date_posted = db.Column(db.DateTime, default=datetime.now())
+    slug = db.Column(db.String(255))
+
+# Create a Post Form
+class PostForm(FlaskForm):
+    title = StringField('Title', validators=[DataRequired()])
+    content = TextAreaField('Content', validators=[DataRequired()])
+    author = StringField('Author', validators=[DataRequired()])
+    slug = StringField('Slug', validators=[DataRequired()])
+    submit = SubmitField('Submit Post')
 
 # Form for Name and Birthday to say hello
 class MyForm(FlaskForm):
@@ -130,6 +145,33 @@ def test_pw():
                             password = password,
                             pw_to_check = pw_to_check,
                             passed = passed)
+
+
+# PAGE 4 : Post PAGE
+@app.route('/add-post', methods=['GET', 'POST'])
+def add_post():
+    form = PostForm()
+    if form.validate_on_submit():
+        post = Posts(
+            author = form.author.data,
+            title = form.title.data,
+            content = form.content.data,
+            slug = form.slug.data,
+        )
+        # Clear form
+        form.title.data = ''
+        form.author.data = ''
+        form.slug.data = ''
+        form.content.data = ''
+
+        # Add post to db
+        db.session.add(post)
+        db.session.commit()
+
+        flash('Post submitted')
+
+    # Redirect to webpage
+    return render_template('add_post.html', form=form)
 
 
 # PAGE USER/ADD
