@@ -146,7 +146,6 @@ def test_pw():
                             pw_to_check = pw_to_check,
                             passed = passed)
 
-
 # PAGE 4 : Post PAGE
 @app.route('/add-post', methods=['GET', 'POST'])
 def add_post():
@@ -173,6 +172,14 @@ def add_post():
     # Redirect to webpage
     return render_template('add_post.html', form=form)
 
+# PAGE : BLOG posts
+@app.route('/posts')
+def posts():
+    # Get all posts from db
+    posts = Posts.query.order_by(Posts.date_posted)
+
+    return render_template('posts.html',
+                            posts=posts)
 
 # PAGE USER/ADD
 @app.route('/user/add', methods=['GET', 'POST'])
