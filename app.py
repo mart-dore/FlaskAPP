@@ -172,7 +172,7 @@ def add_post():
     # Redirect to webpage
     return render_template('add_post.html', form=form)
 
-# PAGE : BLOG posts
+# PAGE : All BLOG posts
 @app.route('/posts')
 def posts():
     # Get all posts from db
@@ -180,6 +180,39 @@ def posts():
 
     return render_template('posts.html',
                             posts=posts)
+
+# PAGE Select one blog post to see
+@app.route('/posts/<int:id>')
+def post(id):
+    post = Posts.query.get_or_404(id)
+    return render_template('post.html', post=post)
+
+# PAGE Edit blog post
+@app.route('/edit_post/<int:id>', methods=['GET', 'POST'])
+def edit_post(id):
+    post = Posts.query.get_or_404(id)
+    form = PostForm()
+    
+    if form.validate_on_submit():
+        post.author = form.author.data
+        post.title = form.title.data
+        post.slug = form.slug.data
+        post.content = form.content.data
+
+        # Update db
+        db.session.add(post)
+        db.session.commit()
+        flash("Post has been updated !")
+        return redirect(url_for('post', id=post.id))
+
+    # fill form with post informations
+    form.title.data = post.title
+    form.author.data = post.author
+    form.slug.data = post.slug
+    form.content.data = post.content
+
+    return render_template('edit_post.html', form=form)
+
 
 # PAGE USER/ADD
 @app.route('/user/add', methods=['GET', 'POST'])
