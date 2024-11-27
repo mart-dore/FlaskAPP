@@ -8,7 +8,6 @@ from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_migrate import Migrate
 
-
 # Create Flask Instance
 app = Flask(__name__)
 
