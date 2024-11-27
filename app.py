@@ -7,6 +7,8 @@ from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_migrate import Migrate
+from flask_login import UserMixin, login_user, LoginManager, login_required, logout_user, current_user
+from sqlalchemy import MetaData
 
 # Create Flask Instance
 app = Flask(__name__)
@@ -17,14 +19,35 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
 app.config['SECRET_KEY'] = 'your_secret_key'  # Clé secrète pour CSRF
 
 # Init db
-db = SQLAlchemy(app)
+metadata = MetaData(
+    naming_convention={
+    "ix": 'ix_%(column_0_label)s',
+    "uq": "uq_%(table_name)s_%(column_0_name)s",
+    "ck": "ck_%(table_name)s_%(constraint_name)s",
+    "fk": "fk_%(table_name)s_%(column_0_name)s_%(referred_table_name)s",
+    "pk": "pk_%(table_name)s"
+    }
+)
+db = SQLAlchemy(app, metadata=metadata)
 # add database migration automation, allowing simple migration of the db
 # each time we change one of our db.Model
-migrate = Migrate(app, db)
+migrate = Migrate(app, db, render_as_batch=True)
+
+# Add Login managment
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = 'login' # redirect to /login if @login_required
+
+@login_manager.user_loader
+def load_user(user_id):
+    return Users.query.get(int(user_id))
+
+
 
 # Create User's model
-class Users(db.Model):
+class Users(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(20), nullable=False, unique=True)
     name = db.Column(db.String(100), nullable=False)
     email = db.Column(db.String(100), nullable=False, unique=True)
     date_added = db.Column(db.DateTime, default=datetime.now())
@@ -51,11 +74,12 @@ class Users(db.Model):
 class UserForm(FlaskForm):
     name = StringField('Name', validators=[DataRequired()])
     email = StringField('Email', validators=[DataRequired()])
-    submit = SubmitField('Submit user')
+    username = StringField('Username', validators=[DataRequired()])
     password_hash = PasswordField('Password',
                                   validators=[DataRequired(), EqualTo('password_hash2', message='Passwords not matching')])
     password_hash2 = PasswordField('Confirm Password',
                                    validators=[DataRequired()])
+    submit = SubmitField('Submit user')
 
 # Create a blog post Model
 class Posts(db.Model):
@@ -74,7 +98,17 @@ class PostForm(FlaskForm):
     slug = StringField('Slug', validators=[DataRequired()])
     submit = SubmitField('Submit Post')
 
+# Create a Login Form
+class LoginForm(FlaskForm):
+    username = StringField('Username', validators=[DataRequired()]) 
+    password = PasswordField('Password',
+                                   validators=[DataRequired()])
+    submit = SubmitField('Login')
+    pass
+
+
 # Form for Name and Birthday to say hello
+# ! TODO : REMOVE
 class MyForm(FlaskForm):
     name = StringField('Name',
                        validators=[DataRequired()])
@@ -92,6 +126,32 @@ class PasswordForm(FlaskForm):
     submit = SubmitField('Submit form')
 
 
+# Login Page
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    form = LoginForm()
+    if form.validate_on_submit():
+        user = Users.query.filter_by(username=form.username.data).first()
+        if user:
+            # Check password
+            if check_password_hash(user.password_hash, form.password.data):
+                login_user(user)
+                flash('Login Successful')
+                return redirect(url_for('dashboard'))
+            else:
+                flash('Wrong Password')
+        else:
+            flash('Wrong username')
+
+    return render_template('login.html', form=form)
+
+
+# Dashboard page
+@app.route('/dashboard', methods=['GET', 'POST'])
+@login_required
+def dashboard():
+    return render_template('dashboard.html')
+
 # Page 1 : INDEX
 @app.route('/', methods=['GET', 'POST'])
 def home():
@@ -100,7 +160,9 @@ def home():
     #     return render_template('name.html', name = form.name.data)
     return render_template('index.html')
 
-# PAGE 2 : FORM
+
+# ! TODO : REMOVE
+# PAGE 2 : 1st form for testings
 @app.route('/form', methods=['GET', 'POST'])
 def form():
     name = None
@@ -245,13 +307,17 @@ def add_user():
             # Hash password
             hashed_pw = generate_password_hash(form.password_hash.data)
             # Add user to db
-            user = Users(name=form.name.data, email=form.email.data, password_hash=hashed_pw)
+            user = Users(name=form.name.data,
+                        email=form.email.data,
+                        password_hash=hashed_pw,
+                        username=form.username.data)
             db.session.add(user)
             db.session.commit()
         name = form.name.data
         # Clear form
         form.name.data = ''
         form.email.data = ''
+        form.username.data = ''
         form.password_hash = ''
         flash('User add succesfully')
     our_users = Users.query.order_by(Users.date_added)

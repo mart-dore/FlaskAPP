@@ -11,7 +11,7 @@
 
     {% if name %}
         <p>
-        Salut <strong>{{ name }} </strong>
+        <!-- Salut <strong>{{ name }} </strong> -->
    
     {% else %}
         <h1>Add User</h1>
@@ -25,6 +25,9 @@
                 </div>
                 <div>
                     {{ form.email.label }} {{ form.email(class="form-control") }}
+                </div>
+                <div>
+                    {{ form.username.label }} {{ form.username(class="form-control") }}
                 </div>
                 <div>
                     {{ form.password_hash.label }} {{ form.password_hash(class="form-control") }}
@@ -55,6 +58,7 @@
             <td>{{ our_user.id }}</td>
             <td><a href="{{ url_for('update', id=our_user.id )}}">{{ our_user.name }}</a></td>
             <td>{{ our_user.email }}</td>
+            <td>{{ our_user.username }}</td>
             <td><a href="{{ url_for('delete', id=our_user.id )}}">delete user</a></td>
 
         </tr>
