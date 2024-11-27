@@ -145,6 +145,13 @@ def login():
 
     return render_template('login.html', form=form)
 
+# Log Out function
+@app.route('/logout', methods=['GET', 'POST'])
+@login_required
+def logout():
+    logout_user()
+    flash('You have been logged out')
+    return redirect(url_for('login'))
 
 # Dashboard page
 @app.route('/dashboard', methods=['GET', 'POST'])
