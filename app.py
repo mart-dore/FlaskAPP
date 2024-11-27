@@ -186,6 +186,26 @@ def post(id):
     post = Posts.query.get_or_404(id)
     return render_template('post.html', post=post)
 
+# DELETE Blog post
+@app.route('/posts/delete/<int:id>')
+def delete_post(id):
+    post_to_delete = Posts.query.get_or_404(id)
+    try:
+        # delete post from db
+        db.session.delete(post_to_delete)
+        db.session.commit()
+        flash('Post Deleted !')
+        # return all posts from db
+        posts = Posts.query.order_by(Posts.date_posted)
+        return render_template('posts.html',
+                            posts=posts)
+    except:
+        flash('Oops Try Again !')
+        # return all posts from db
+        posts = Posts.query.order_by(Posts.date_posted)
+        return render_template('posts.html',
+                            posts=posts)
+
 # PAGE Edit blog post
 @app.route('/edit_post/<int:id>', methods=['GET', 'POST'])
 def edit_post(id):
@@ -241,7 +261,6 @@ def add_user():
                             name=name,
                             our_users=our_users)
 
-
 # Update DB record
 @app.route('/update/<int:id>', methods=['GET', 'POST'])
 def update(id):
@@ -295,7 +314,6 @@ def delete(id):
                             name=name,
                             our_users=our_users)
         
-
 
 # PAGE USER/NAME
 @app.route('/user/<name>')
