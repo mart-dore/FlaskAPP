@@ -9,8 +9,14 @@
 {% endfor %}
 
 
-<h1>Dashboard</h1>
+<center><h1>Dashboard</h1></center>
+<div class="shadow p-3 mb-5 bg-body-tertiary rounded">
+    <strong>Name : </strong> {{ current_user.name }} <br>
+    <strong>Username : </strong>{{ current_user.username }}<br>
+    <strong>Email Address : </strong> {{ current_user.email }}<br>
+    <strong>User ID : </strong>{{ current_user.id }}<br>
+    <strong>Member since : </strong> {{ current_user.date_added }}<br>
 
-<a href="{{ url_for('logout') }}" class="btn btn-outline-danger">Logout</a>
-
+    <a href="{{ url_for('logout') }}" class="btn btn-outline-danger">Logout</a>
+</div>
 {% endblock %}
