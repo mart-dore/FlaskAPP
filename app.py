@@ -1,14 +1,12 @@
 from flask import Flask, request, render_template, redirect, url_for, flash
-from flask_wtf import FlaskForm
-from wtforms import StringField, DateField, SubmitField, PasswordField, BooleanField, TextAreaField,ValidationError
-from wtforms.validators import DataRequired, EqualTo, Length
-from wtforms.widgets import TextArea
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_migrate import Migrate
 from flask_login import UserMixin, login_user, LoginManager, login_required, logout_user, current_user
 from sqlalchemy import MetaData
+from webforms import LoginForm, UserForm, PostForm, PasswordForm
+
 
 # Create Flask Instance
 app = Flask(__name__)
@@ -70,17 +68,6 @@ class Users(db.Model, UserMixin):
     def __repr__(self):
         return '<Name %r>' % self.name
 
-# Form for User
-class UserForm(FlaskForm):
-    name = StringField('Name', validators=[DataRequired()])
-    email = StringField('Email', validators=[DataRequired()])
-    username = StringField('Username', validators=[DataRequired()])
-    password_hash = PasswordField('Password',
-                                  validators=[DataRequired(), EqualTo('password_hash2', message='Passwords not matching')])
-    password_hash2 = PasswordField('Confirm Password',
-                                   validators=[DataRequired()])
-    submit = SubmitField('Update Profile')
-
 # Create a blog post Model
 class Posts(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -89,32 +76,6 @@ class Posts(db.Model):
     author = db.Column(db.String(255))
     date_posted = db.Column(db.DateTime, default=datetime.now())
     slug = db.Column(db.String(255))
-
-# Create a Post Form
-class PostForm(FlaskForm):
-    title = StringField('Title', validators=[DataRequired()])
-    content = TextAreaField('Content', validators=[DataRequired()])
-    author = StringField('Author', validators=[DataRequired()])
-    slug = StringField('Slug', validators=[DataRequired()])
-    submit = SubmitField('Submit Post')
-
-# Create a Login Form
-class LoginForm(FlaskForm):
-    username = StringField('Username', validators=[DataRequired()]) 
-    password = PasswordField('Password',
-                                   validators=[DataRequired()])
-    submit = SubmitField('Login')
-    pass
-
-
-# Form to check password
-class PasswordForm(FlaskForm):
-    email = StringField('Email',
-                       validators=[DataRequired()])
-    password_hash  = PasswordField('Password',
-                             validators=[DataRequired()])
-    submit = SubmitField('Submit form')
-
 
 # Login Page
 @app.route('/login', methods=['GET', 'POST'])
