@@ -107,6 +107,16 @@ class LoginForm(FlaskForm):
     pass
 
 
+# Form for Name and Birthday to say hello
+# ! TODO : REMOVE
+class MyForm(FlaskForm):
+    name = StringField('Name',
+                       validators=[DataRequired()])
+    birthday = DateField('Birthday',
+                         format='%Y-%m-%d', validators=[DataRequired()])
+
+    submit = SubmitField('Submit form')
+
 # Form to check password
 class PasswordForm(FlaskForm):
     email = StringField('Email',
@@ -158,6 +168,10 @@ def home():
     return render_template('index.html')
 
 
+# ! TODO : REMOVE
+# PAGE 2 : 1st form for testings
+@app.route('/form', methods=['GET', 'POST'])
+def form():
     name = None
     form = MyForm()
     if form.validate_on_submit():
