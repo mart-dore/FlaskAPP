@@ -16,6 +16,16 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
 # Secret Key
 app.config['SECRET_KEY'] = 'your_secret_key'  # Clé secrète pour CSRF
 
+# Add Login managment
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = 'login' # redirect to /login if @login_required
+
+@login_manager.user_loader
+def load_user(user_id):
+    return Users.query.get(int(user_id))
+
+# ?---- DATABASE GESTION ------
 # Init db
 metadata = MetaData(
     naming_convention={
@@ -26,21 +36,11 @@ metadata = MetaData(
     "pk": "pk_%(table_name)s"
     }
 )
+
 db = SQLAlchemy(app, metadata=metadata)
 # add database migration automation, allowing simple migration of the db
 # each time we change one of our db.Model
 migrate = Migrate(app, db, render_as_batch=True)
-
-# Add Login managment
-login_manager = LoginManager()
-login_manager.init_app(app)
-login_manager.login_view = 'login' # redirect to /login if @login_required
-
-@login_manager.user_loader
-def load_user(user_id):
-    return Users.query.get(int(user_id))
-
-
 
 # Create User's model
 class Users(db.Model, UserMixin):
@@ -76,6 +76,8 @@ class Posts(db.Model):
     author = db.Column(db.String(255))
     date_posted = db.Column(db.DateTime, default=datetime.now())
     slug = db.Column(db.String(255))
+# ?----------------------------
+
 
 # Login Page
 @app.route('/login', methods=['GET', 'POST'])
