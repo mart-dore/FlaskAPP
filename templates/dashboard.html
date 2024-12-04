@@ -18,5 +18,6 @@
     <strong>Member since : </strong> {{ current_user.date_added }}<br>
 
     <a href="{{ url_for('logout') }}" class="btn btn-outline-danger">Logout</a>
+    <a href="{{ url_for('update', id=current_user.id )}}" class="btn btn-outline-warning">Update profile</a></td>
 </div>
 {% endblock %}

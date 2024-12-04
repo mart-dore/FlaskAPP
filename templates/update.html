@@ -34,12 +34,15 @@
                     {{ form.name.label }} {{ form.name(class="form-control", value=name_to_update.name) }}
                 </div>
                 <div>
+                    {{ form.username.label }} {{ form.username(class="form-control", value=name_to_update.username) }}
+                </div>
+                <div>
                     {{ form.email.label }} {{ form.email(class="form-control", value=name_to_update.email) }}
                 </div>
                 <div>
                     <br>
                     {{form.submit(class="btn btn-primary")}}
-                    <a href="{{ url_for('delete', id=id )}}" class="btn btn-danger">Delete user</a>
+                    <a href="{{ url_for('delete', id=id )}}" class="btn btn-danger">Delete profile</a>
                 </div>
             </form>
         </div> 

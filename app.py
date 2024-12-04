@@ -79,7 +79,7 @@ class UserForm(FlaskForm):
                                   validators=[DataRequired(), EqualTo('password_hash2', message='Passwords not matching')])
     password_hash2 = PasswordField('Confirm Password',
                                    validators=[DataRequired()])
-    submit = SubmitField('Submit user')
+    submit = SubmitField('Update Profile')
 
 # Create a blog post Model
 class Posts(db.Model):
@@ -216,6 +216,7 @@ def test_pw():
 
 # PAGE 4 : Post PAGE
 @app.route('/add-post', methods=['GET', 'POST'])
+@login_required
 def add_post():
     form = PostForm()
     if form.validate_on_submit():
@@ -277,6 +278,7 @@ def delete_post(id):
 
 # PAGE Edit blog post
 @app.route('/edit_post/<int:id>', methods=['GET', 'POST'])
+@login_required
 def edit_post(id):
     post = Posts.query.get_or_404(id)
     form = PostForm()
@@ -334,7 +336,7 @@ def add_user():
                             name=name,
                             our_users=our_users)
 
-# Update DB record
+# Update user DB record
 @app.route('/update/<int:id>', methods=['GET', 'POST'])
 def update(id):
     form = UserForm()
@@ -342,6 +344,7 @@ def update(id):
     if request.method == "POST":
         name_to_update.name = request.form['name']
         name_to_update.email = request.form['email']
+        name_to_update.username = request.form['username']
         try:
             db.session.commit()
             flash("User updated successfully")
