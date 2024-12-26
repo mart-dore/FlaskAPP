@@ -287,6 +287,7 @@ def add_user():
 
 # Update user DB record
 @app.route('/update/<int:id>', methods=['GET', 'POST'])
+@login_required
 def update(id):
     form = UserForm()
     name_to_update = Users.query.get_or_404(id)
